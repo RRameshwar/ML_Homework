@@ -92,8 +92,6 @@ class Tree(object):
 		megalist = []
 		attrs = []
 		total = len(Y)
-		print X
-		print Y
 
 		for i in range(0, len(X)):
 			if(X[i] in attrs):
@@ -102,10 +100,8 @@ class Tree(object):
 				megalist.append([Y[i]])
 				attrs.append(X[i])
 
-		print(megalist)
 		for j in megalist:
 			ce = ce + (len(j)/float(total))*Tree.entropy(j)  #CE is going to be positive, so we haveto subtract from the parent entropy.
- 			print ce
 		#########################################
 		return ce 
 	
@@ -128,9 +124,7 @@ class Tree(object):
 		children = Tree.conditional_entropy(Y,X)
 
 		g = parent - children
-		
-		#print(parent)
-		#print(children)
+
  
 		#########################################
 		return g
@@ -214,41 +208,19 @@ class Tree(object):
 				sortedY[-1].append(Y[j])
 				attrs.append(att)
 
-		sortedX_np = np.array(sortedX)
-		print(sortedX_np[0].shape)
 		
-		for m in range(0, len(sortedX_np)):
-			sortedX_np[m] = np.array(sortedX_np[m])
-
-		# for n in range (0, len(sortedX)):
-		# 	for m in range (0, n):
-		# 		sortedX_np[n][m] = sortedX[n][m]
-
-		# for k in range(0, len(sortedX)):
-		# 	for n in range(0, len(sortedX[k])):
-		# 		sortedX_np[k][n] = np.array(sortedX[k][n])
-		# for k in range(0, len(sortedY)):
-		# 	sortedY[k] = np.array(sortedY[k])
-
+		sortedX_np = []
+		sortedY_np = []
 		
-		#for k in sortedX:
-			#np.append(sortedX_np, k)
+		for b in sortedX:
+			sortedX_np.append(np.array(b))
 
-		#print(sortedX)
-		#sortedX_np = sortedX_np.flatten()
-		
-		print(["THIS IS X!!: ", X])
-		print(["THIS IS SORTED X!!: ", sortedX_np])
-		print(["THIS IS C!!: ", C])
-
-		sortedY_np = np.asarray(sortedY)
-
+		for a in sortedY:
+			sortedY_np.append(np.array(a))
 
 		for j in range(0, len(sortedX_np)):
-			print(j)
 			n = Node(sortedX_np[j], sortedY_np[j])
 			C[sortedX_np[j][i][0]] = n
-
 
 		return C
 
@@ -271,7 +243,7 @@ class Tree(object):
 				s = True			
 			else:
 				s = False
-				break
+				return s
 
 		
 		#########################################
@@ -289,14 +261,20 @@ class Tree(object):
 			Output:
 				s: whether or not Conidtion 2 holds, a boolean scalar. 
 		'''
+		#print(X)
 		#########################################
+		s = True
 		for i in X:
-			for n in i:
-				if (n==i[0]):
+			print(i)
+			for j in range(0, len(i)):
+				if i[j] == i[0]:
 					s = True
 				else:
 					s = False
-					break
+					return s
+
+
+			
 
 		#########################################
 		return s
@@ -330,7 +308,7 @@ class Tree(object):
 		'''
 			Recursively build tree nodes.
 			Input:
-				t: a node of the decision tree, without the subtree built.
+				t: a ndoe of the decision tree, without the subtree built.
 				t.X: the feature matrix, a np float matrix of shape n by p.
 				   Each element can be int/float/string.
 					Here n is the number data instances, p is the number of attributes.
@@ -345,26 +323,23 @@ class Tree(object):
 			recursion_depth-=1
 			t.isleaf = True
 			t.p = Tree.most_common(t.Y)
-			return t #returns final node
-		if(Tree.stop2(t.X)): #Stops if all classes are the same
+			#return t #returns final node
+		elif(Tree.stop2(t.X)): #Stops if all attributes are the same
 			recursion_depth-=1
 			t.isleaf = True
 			t.p = Tree.most_common(t.Y)
-			return t #returns final node
+			#return t #returns final node
 		else:
 			t.p = Tree.most_common(t.Y)
 			attr_best = Tree.best_attribute(t.X,t.Y)
 			t.i = attr_best
+			t.isleaf = False
 			t.C = Tree.split(t.X ,t.Y, attr_best)
-			print(t.C)
-			ex = t.C['a'].X
-			print(ex)
-			print(ex.shape)
 			for pair in t.C:				
-				return Tree.build_tree(t.C[pair]) #build new tree from node. Will stop when no more building
+				Tree.build_tree(t.C[pair]) #build new tree from node. Will stop when no more building
 	
 		#########################################
-	
+		return t
 	
 	#-------------------------
 	@staticmethod
@@ -408,11 +383,16 @@ class Tree(object):
 				   Each element can be int/float/string.
 		'''
 		#########################################
-		if Tree.stop1(t.Y): #we're at a leaf!
-			return t.y[0] 
+		if t.isleaf:
+			return(t.p) 
 		else:
-			nextNode = t.C[x[t.i]] #The next node is the dictionary element corresponding to the value of x at the best attribute
-			return Tree.inference(nextNode, x)
+			att_test = t.i #attribute to test this node	
+			print(t.C)
+			if x[t.i] in t.C:
+				nextNode = t.C[x[t.i]] #The next node is the dictionary element corresponding to the value of x at the best attribute
+				return Tree.inference(nextNode, x)
+			else:
+				return t.p
  
 		#########################################
 		#return y
@@ -432,14 +412,16 @@ class Tree(object):
 				   Each element can be int/float/string.
 		'''
 		#########################################
-		if t is None:
-			print("T is NONE WHYYY")
-		Y = []
-		for x in X:
-			Y.append(Tree.inference(t,x))
+		#print(["FIRST COLUMN OF X: ", X[:,0]])
+		print(X)
+		Labels = []
+		for x in range(0, len(X[0])):
+			sample = X[:,x]
+			Labels.append(Tree.inference(t,sample))
 
 		#########################################
-		return Y
+		print(Labels)
+		return np.array(Labels)
 
 
 
@@ -490,9 +472,22 @@ class Tree(object):
 		return X,Y
 
 if __name__ == '__main__':
-	X, Y = Tree.load_dataset()
-	t = Tree.train(X,Y)
-	Tree.printTree(t)
+	X = np.array([['apple','orange','pineapple','banana'],
+				  ['high','high','low','low'],
+				  ['a','b','c','d']])
+	Y = np.array(['good','good','good','good'])
+	t = Node(X=X, Y=Y) # root node
+	
+	# build tree
+	Tree.build_tree(t)
+	print(t.isleaf)
+
+	print(Tree.stop1(t.Y))
+	print(Tree.stop2(t.X))
+	print(t.p)
+	print(t.C)
+	print(t.i)
+
 
 
 

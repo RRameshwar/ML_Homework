@@ -8,7 +8,6 @@ import os
     You could test the correctness of your code by typing `nosetests -v test1.py` in the terminal.
 '''
 
-sys.stderr = open(os.devnull, "w")
 #-------------------------------------------------------------------------
 def test_python_version():
     ''' ----------- Problem 1 (60 points in total)---------------------'''
@@ -506,6 +505,9 @@ def test_build_tree():
     assert c3.Y[0] == 'perfect'
 
     assert isinstance(c1, Node)
+    print(["THIS IS C1: ", c1.X, c1.Y])
+    print(Tree.stop1(c1.Y))
+    print(Tree.stop2(c1.X))
     assert c1.isleaf == False 
     assert c1.p == 'good' or c1.p == 'bad'
     assert c1.X.shape == (3,2) 

@@ -4,8 +4,6 @@ from collections import Counter
 
 import csv
 
-import sys
-
 
 
 # Note: please don't add any new package, you should solve this problem using only the packages above.
@@ -15,8 +13,6 @@ import sys
 	In this problem, you will implement the decision tree method for classification problems.
 	You could test the correctness of your code by typing `nosetests -v test1.py` in the terminal.
 '''
-global recursion_depth
-recursion_depth = 0	
 #-----------------------------------------------
 class Node:
 	'''
@@ -79,14 +75,14 @@ class Tree(object):
 	#--------------------------
 	@staticmethod
 	def conditional_entropy(Y,X):
-		'''
+		"""
 			Compute the conditional entropy of y given x. The conditional entropy H(Y|X) means average entropy of children nodes, given attribute X. Refer to https://en.wikipedia.org/wiki/Information_gain_in_decision_trees
 			Input:
-				X: a list of values , a np array of int/float/string values. The size of the array means the number of instances/examples. X contains each instance's attribute value. 
+				X: a list of values , a np array of int/float/string values. The size of the array means the number of instances/examples. X contains each instance's attribute value.
 				Y: a list of values, a np array of int/float/string values. Y contains each instance's corresponding target label. For example X[0]'s target label is Y[0]
 			Output:
 				ce: the conditional entropy of y given x, a float scalar
-		'''
+		"""
 		#########################################
 		ce = 0
 		megalist = []
@@ -261,11 +257,9 @@ class Tree(object):
 			Output:
 				s: whether or not Conidtion 2 holds, a boolean scalar. 
 		'''
-		#print(X)
 		#########################################
 		s = True
 		for i in X:
-			print(i)
 			for j in range(0, len(i)):
 				if i[j] == i[0]:
 					s = True
@@ -317,15 +311,12 @@ class Tree(object):
 				   Each (key, value) pair represents an attribute value and its corresponding child node.
 		'''
 		#########################################
-		recursion_depth+=1
 		
 		if(Tree.stop1(t.Y)): #Stops if all classes are the same
-			recursion_depth-=1
 			t.isleaf = True
 			t.p = Tree.most_common(t.Y)
 			#return t #returns final node
 		elif(Tree.stop2(t.X)): #Stops if all attributes are the same
-			recursion_depth-=1
 			t.isleaf = True
 			t.p = Tree.most_common(t.Y)
 			#return t #returns final node
@@ -360,15 +351,7 @@ class Tree(object):
 		t = Tree.build_tree(t1)
 		#########################################
 		return t
-	
-	@staticmethod
-	def printTree(t):
-		if Tree.stop1(t.Y): #we're at a leaf!
-			print(t.X) 
-		else:
-			nextNodes = t.C
-			for c in t.C:
-				return Tree.printTree[t.C[c]] #The next node is the dictionary element corresponding to the value of x at the best attribute
+
 	#--------------------------
 	@staticmethod
 	def inference(t,x):
@@ -386,8 +369,7 @@ class Tree(object):
 		if t.isleaf:
 			return(t.p) 
 		else:
-			att_test = t.i #attribute to test this node	
-			print(t.C)
+			att_test = t.i #attribute to test this node
 			if x[t.i] in t.C:
 				nextNode = t.C[x[t.i]] #The next node is the dictionary element corresponding to the value of x at the best attribute
 				return Tree.inference(nextNode, x)
@@ -412,15 +394,12 @@ class Tree(object):
 				   Each element can be int/float/string.
 		'''
 		#########################################
-		#print(["FIRST COLUMN OF X: ", X[:,0]])
-		print(X)
 		Labels = []
 		for x in range(0, len(X[0])):
 			sample = X[:,x]
 			Labels.append(Tree.inference(t,sample))
 
 		#########################################
-		print(Labels)
 		return np.array(Labels)
 
 
@@ -480,14 +459,3 @@ if __name__ == '__main__':
 	
 	# build tree
 	Tree.build_tree(t)
-	print(t.isleaf)
-
-	print(Tree.stop1(t.Y))
-	print(Tree.stop2(t.X))
-	print(t.p)
-	print(t.C)
-	print(t.i)
-
-
-
-

@@ -1,0 +1,10 @@
+// Credit Risk
+digraph {
+	Income [label=Income color=blue]
+	low0 [label=low]
+		Income -> low0 [label=high]
+	high1 [label=high]
+		Income -> high1 [label=low]
+	low2 [label=low]
+		Income -> low2 [label=medium]
+}
